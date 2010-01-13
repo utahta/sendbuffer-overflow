@@ -29,7 +29,7 @@ private:
 	int m_hpos;
 	char m_body[MAX_BODY_LEN+1];
 	int m_bpos;
-	int m_blen;
+	short m_blen;
 
 public:
 	CMessagePack();

@@ -89,7 +89,7 @@ int CMessagePack::deserialize( CStreamBuffer &s )
 		s.get( m_head, MAX_HEADER_LEN );
 		s.compact( MAX_HEADER_LEN );
 
-		m_blen = static_cast<int>(((m_head[0] << 8) & 0xff) | (m_head[1] & 0xff));
+		m_blen = static_cast<short>(((m_head[0] & 0xff) << 8) | (m_head[1] & 0xff));
 		char tmp[5];
 		tmp[0] = m_head[2];
 		tmp[1] = m_head[3];

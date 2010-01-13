@@ -9,11 +9,13 @@
 #include "connection.h"
 #include <event.h>
 
+const int TEST_MSGLEN = 256;
+
 class CClient
 {
 private:
 	CConnection m_con;
-	struct event m_ev;
+	struct event m_rev;
 	struct event m_wev;
 
 public:
@@ -29,6 +31,8 @@ public:
 	int addReadEvent();
 	int addWriteEvent();
 	void removeEvent();
+	void removeReadEvent();
+	void removeWriteEvent();
 
 	int open( const char *addr, short port );
 	void close();

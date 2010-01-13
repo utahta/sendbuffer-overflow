@@ -15,20 +15,6 @@
 #define CONNECT_ADDR "127.0.0.1"
 #define CONNECT_PORT (12345)
 
-void writeev_callback( int fd, short flag, void *arg )
-{
-	printf( "Write callback!\n" );
-	CClient *client = static_cast<CClient *>(arg);
-
-	if( flag & EV_WRITE ){
-		char str[128];
-    	CMessagePack msg;
-		msg.init();
-		msg.packString( str, sizeof( str ) );
-		client->send( msg );
-	}
-}
-
 void oneshot_send( int fd, short flag, void *arg )
 {
 	CClient *client = static_cast<CClient *>(arg);
@@ -40,18 +26,13 @@ void oneshot_send( int fd, short flag, void *arg )
     }
     printf( "send buffer size. :%d\n", so_opt );
 
-    char str[128];
-//    printf( "press enter:" );
-//    fgets( str, sizeof(str), stdin );
-
     // create data.
+    char str[TEST_MSGLEN];
     memset( str, 0, sizeof( str ) );
-    for( int i = 0; i < sizeof( str )-1; ++i ){
-    	str[i] = 'a'+ (i % 26);
-    }
 
-//    for( int i = 0; i < (128*1024); ++i ){
     for( int i = 0; i < 500; ++i ){
+    	sprintf( str, "abcdefghijklnmopqrstuvwxyz:%d", i );
+
     	CMessagePack msg;
 		msg.init();
 		msg.packString( str, sizeof( str ) );
