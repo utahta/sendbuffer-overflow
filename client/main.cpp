@@ -25,11 +25,11 @@ void oneshot_send( int fd, short flag, void *arg )
 		printf( "Failed to get SO_SNDBUF option to the socket. %s. %d bytes", strerror(errno), so_opt );
     }
     printf( "send buffer size. :%d\n", so_opt );
+	client->addEvent();
 
     // create data.
     char str[TEST_MSGLEN];
     memset( str, 0, sizeof( str ) );
-
     for( int i = 0; i < 500; ++i ){
     	sprintf( str, "abcdefghijklnmopqrstuvwxyz:%d", i );
 
@@ -38,7 +38,6 @@ void oneshot_send( int fd, short flag, void *arg )
 		msg.packString( str, sizeof( str ) );
 		client->send( msg );
     }
-    client->addReadEvent();
 }
 
 int main(void)

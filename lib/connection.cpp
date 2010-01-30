@@ -49,6 +49,7 @@ int CConnection::open( const char* addr, short port )
 void CConnection::close()
 {
 	::close( m_sd );
+	m_sd = -1;
 }
 
 int CConnection::send( CMessagePack &msg )

@@ -15,8 +15,7 @@ class CClient
 {
 private:
 	CConnection m_con;
-	struct event m_rev;
-	struct event m_wev;
+	struct event m_ev;
 
 public:
 	CClient( int sd=-1 );
@@ -28,11 +27,9 @@ public:
 
 	void term();
 
-	int addReadEvent();
-	int addWriteEvent();
+	int addEvent();
+	int updateEvent( int flags );
 	void removeEvent();
-	void removeReadEvent();
-	void removeWriteEvent();
 
 	int open( const char *addr, short port );
 	void close();

@@ -43,7 +43,7 @@ void CServer::accept( int fd, short flag, void *arg )
 	}
 
 	CClient *p = new CClient( sd );
-	p->addReadEvent();
+	p->addEvent();
 
 	printf( "connected. sd:%d\n", sd );
 }

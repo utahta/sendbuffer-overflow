@@ -23,42 +23,25 @@ void CClient::term()
 	removeEvent();
 }
 
-int CClient::addReadEvent()
+int CClient::addEvent()
 {
-	event_set( &m_rev, m_con.getSd(), EV_READ | EV_PERSIST, CClient::callback, this );
-	return event_add( &m_rev, NULL );
+	event_set( &m_ev, m_con.getSd(), EV_READ | EV_PERSIST, CClient::callback, this );
+	return event_add( &m_ev, NULL );
 }
 
-int CClient::addWriteEvent()
+int CClient::updateEvent( int flags )
 {
-	if( event_initialized( &m_wev ) ){
-		return 0;
-	}
-	// When the send-buffer overflows, this function is called.
-	event_set( &m_wev, m_con.getSd(), EV_WRITE, CClient::callback, this );
-	return event_add( &m_wev, NULL );
+	event_del( &m_ev );
+	event_set( &m_ev, m_con.getSd(), flags, CClient::callback, this );
+	return event_add( &m_ev, NULL );
 }
 
 void CClient::removeEvent()
 {
-	removeReadEvent();
-	removeWriteEvent();
-}
-
-void CClient::removeReadEvent()
-{
-	if( event_initialized( &m_rev ) ){
-		event_del( &m_rev );
+	if( event_initialized( &m_ev ) ){
+		event_del( &m_ev );
 	}
-	memset( &m_rev, 0, sizeof( m_rev ) );
-}
-
-void CClient::removeWriteEvent()
-{
-	if( event_initialized( &m_wev ) ){
-		event_del( &m_wev );
-	}
-	memset( &m_wev, 0, sizeof( m_wev ) );
+	memset( &m_ev, 0, sizeof( m_ev ) );
 }
 
 int CClient::open( const char *addr, short port )
@@ -80,7 +63,8 @@ int CClient::send( CMessagePack &msg )
 	printf( "send buffer size:%d res:%d sd:%d\n", value, res, m_con.getSd() );
 
 	if( res == ERR_SEND_FAILED ){
-		addWriteEvent();
+		// When the send-buffer overflows, this function is called.
+		updateEvent( EV_READ | EV_WRITE | EV_PERSIST );
 	}
 	return res;
 }
@@ -88,14 +72,15 @@ int CClient::send( CMessagePack &msg )
 int CClient::resend()
 {
 	int res = m_con.resend();
-	removeWriteEvent();
+	updateEvent( EV_READ | EV_PERSIST );
 
 	int value;
 	ioctl( m_con.getSd(), SIOCOUTQ, &value );
 	printf( "resend buffer size:%d res:%d sd:%d\n", value, res, m_con.getSd() );
 
 	if( res == ERR_SEND_FAILED ){
-		addWriteEvent();
+		// When the send-buffer overflows, this function is called.
+		updateEvent( EV_READ | EV_WRITE | EV_PERSIST );
 	}
 	return res;
 }
